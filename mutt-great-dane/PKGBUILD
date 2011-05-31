@@ -5,7 +5,8 @@ pkgrel=1
 pkgdesc="A small but very powerful text-based mail client with sidebar, NNTP, compressed, trash folder, urlview, and much more!"
 arch=('i686' 'x86_64')
 url="http://lunar-linux.org/index.php?page=mutt-sidebar"
-depends=('openssl' 'gdbm' 'mime-types' 'libsasl' 'slang' 'libidn' 'heimdal' 'gnupg' 'gpgme')
+depends=('openssl' 'gdbm' 'mime-types' 'libsasl' 'slang' 'libidn'
+         'heimdal' 'gnupg' 'gpgme')
 makedepends=('libxslt' 'lynx')
 conflicts=('mutt')
 provides=('mutt')
@@ -91,7 +92,7 @@ build() {
   patch -p1 -Nui ../patch-${pkgver}.cd.purge_message.8
   # Source multiple files in a single call (useful for globbing)
   patch -p1 -Nui ../patch-${pkgver}.cd.source_multiple.3
-  patch -p1 -Nui ../patch-${pkgver}.csev.ask_passphrase.1 # Fix passphrase errors
+  patch -p1 -Nui ../patch-${pkgver}.csev.ask_passphrase.1 # Fix passphrase error
   patch -p1 -Nui ../patch-${pkgver}.tamo.w3mface.3 # Show X-Face in mutt
   patch -p1 -Nui ../patch-${pkgver}.dgc.deepif.2 # Allow nested if statements
   patch -p1 -Nui ../patch-${pkgver}.ats.date_conditional.3 # Conditions on dates
