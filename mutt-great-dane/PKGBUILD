@@ -35,11 +35,9 @@ source=(ftp://ftp.mutt.org/mutt/devel/mutt-${pkgver}.tar.gz
         patch-0.9.csev.urlview-fixes.1
         patch-0.9.csev.urlview-manprefix.1
         urlview.c.qpd-patch)
-md5sums=('027cdd9959203de0c3c64149a7ee351c'
+md5sums=('a29db8f1d51e2f10c070bf88e8a553fd'
          '67731f73e69297ffd106b65c8aebb2ab'
          '336d1d8e290a0595dbe2cd92d720ffc9'
-         '3f54850315502ad47405421339ffae60'
-         'fa8e03a49a2fa7b294dc8237d928cdb7'
          '5c67c8bf89160b48cfd6a110d0c8e34a'
          '0670750f2d82a32391c842e202aae775'
          '32d1899cfea50b0d00c7ca88406cb7ee'
@@ -49,12 +47,12 @@ md5sums=('027cdd9959203de0c3c64149a7ee351c'
          '31de8c2733f87de6046cd4f3ba7690a4'
          'b3a07af278ed9c7f16310be2fe1675ea'
          '7cb9520885799d634a7aa127c37e30e6'
-         '2d685df96c72dc8a3ae98ae34e5510ba'
+         '4b34b6911edd1bc7bf1c8eff33b35c08'
          '5786519489877c92e4fff68cf547e869'
          '562339078f5f1be52f8f068a86a31676'
-         '9b63d1ff4f702489366660ecfa209271'
-         '1aefc046f02b1bbea3ae4b2e8e6a25de'
-         'c1330d71d0ba14638dc7baa9bc5a9c4f'
+         '1e22b6f0a2a6628289baee19c37e2536'
+         'ce252bdd16235be3eb7cc6dcc020cdc0'
+         'dcdc940070d3bd0bcf7017af70cfffc3'
          '659d26f6dae386d55a58c5311e57632e'
          'e44269dcaada8e6ba9bd299bb4597899'
          'a83177bfd298fa3d2644d538cc79379b'
@@ -72,7 +70,7 @@ build() {
 
   cd $srcdir/mutt-$pkgver
   patch -p1 -Ni ../patch-${pkgver}.sidebar.20090619.txt # Sidebar == awesome
-  patch -p1 -Ni ../patch-${pkgver}.vvv.nntp.2 # NNTP support. ZOMG w00t! Gmane <3
+  patch -p1 -Ni ../patch-${pkgver}.vvv.nntp.2 # NNTP support. Gmane <3
   # Use normal stat instead of lstat, to support symbolic directories
   patch -p1 -Nui ../newsrc_stat.patch
   patch -p1 -Nui ../patch-${pkgver}.rr.compressed # Support compressed mail*
