@@ -1,7 +1,7 @@
 # Contributor: Colin Shea <colin@evaryont.me>
 pkgname=mutt-great-dane
-pkgver=1.5.20
-pkgrel=5
+pkgver=1.5.21
+pkgrel=1
 pkgdesc="A small but very powerful text-based mail client with sidebar, NNTP, compressed, trash folder, urlview, and much more!"
 arch=('i686' 'x86_64')
 url="http://lunar-linux.org/index.php?page=mutt-sidebar"
@@ -13,7 +13,6 @@ source=(ftp://ftp.mutt.org/mutt/devel/mutt-${pkgver}.tar.gz
         ftp://ftp.mutt.org/pub/mutt/contrib/urlview-0.9.tar.gz
         muttrc.example
         mutt_ssl.patch
-        mutt-unmailbox.patch
         patch-${pkgver}.as.echo.2
         patch-${pkgver}.ats.date_conditional.3
         patch-${pkgver}.cd.ifdef.2
@@ -72,8 +71,6 @@ build() {
   ## mutt
 
   cd $srcdir/mutt-$pkgver
-  # patch a segfault bug in 1.5.20 -- remove for next release
-  patch -p1 -Ni ../mutt-unmailbox.patch
   patch -p1 -Ni ../mutt_ssl.patch # SSL bug fix
   patch -p1 -Ni ../patch-${pkgver}.sidebar.20090619.txt # Sidebar == awesome
   patch -p1 -Ni ../patch-${pkgver}.vvv.nntp.2 # NNTP support. ZOMG w00t! Gmane <3
