@@ -1,12 +1,12 @@
 # Contributor: Colin Shea <colin@evaryont.me>
 pkgname=mutt-great-dane
 pkgver=1.5.20
-pkgrel=4
+pkgrel=5
 pkgdesc="A small but very powerful text-based mail client with sidebar, NNTP, compressed, trash folder, urlview, and much more!"
 arch=('i686' 'x86_64')
 url="http://lunar-linux.org/index.php?page=mutt-sidebar"
-depends=('openssl' 'gdbm' 'mime-types' 'libsasl' 'slang' 'libidn' 'heimdal')
-makedepends=('gnupg' 'gpgme')
+depends=('openssl' 'gdbm' 'mime-types' 'libsasl' 'slang' 'libidn' 'heimdal' 'gnupg' 'gpgme')
+makedepends=('libxslt' 'lynx')
 conflicts=('mutt')
 provides=('mutt')
 source=(ftp://ftp.mutt.org/mutt/devel/mutt-${pkgver}.tar.gz
@@ -101,13 +101,13 @@ build() {
   patch -p1 -Nui ../patch-${pkgver}.dgc.deepif.2 # Allow nested if statements
   patch -p1 -Nui ../patch-${pkgver}.ats.date_conditional.3 # Conditions on dates
 
+  # Delete all the patch-save files
+  find -name \*.orig -delete
+
   aclocal -I m4
   autoheader
   automake --foreign
   autoconf
-
-  # Delete all the patch-save files
-  find -name \*.orig -delete
 
   # (apply this patch after automake)
   patch -p1 -i ../patch-${pkgver}.csev.yesnet.1 # Allow xslt to go online & d/l
