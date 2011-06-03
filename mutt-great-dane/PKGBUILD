@@ -35,7 +35,7 @@ source=(ftp://ftp.mutt.org/mutt/devel/mutt-${pkgver}.tar.gz
         mutt-attach.patch
         newsrc_stat.patch
         trash_folder-1.5.18.patch
-        mutt-xterm_title.patch
+        mutt-xterm_title.patch.2
         patch-0.9.dw.urlview-html.3
         patch-0.9.csev.urlview-fixes.1
         patch-0.9.csev.urlview-manprefix.1
@@ -56,7 +56,7 @@ md5sums=('a29db8f1d51e2f10c070bf88e8a553fd'
          'f82db552859813b67b11efe24302362d'
          '562339078f5f1be52f8f068a86a31676'
          '1e22b6f0a2a6628289baee19c37e2536'
-         'cd94294a7571ca641f22f16f7e616aba'
+         '6f5f25c7b90382c88b468c1be612d833'
          'dcdc940070d3bd0bcf7017af70cfffc3'
          'eb4818622b6540770eeb81dbea8447f8'
          '0bbc48f7c0cc10e15ac9dbae7d34b82d'
@@ -65,7 +65,7 @@ md5sums=('a29db8f1d51e2f10c070bf88e8a553fd'
          '659d26f6dae386d55a58c5311e57632e'
          'e44269dcaada8e6ba9bd299bb4597899'
          'a83177bfd298fa3d2644d538cc79379b'
-         '62915087c5ec050785c85a78415f7ea0'
+         '2c5f8df784be0d6c09e8e2295d3b6ebf'
          'fe79ea2cc0c590762cd7940a1c8e2a9a'
          'b9445c1e532a2a0969fb6e3d8fbc86b5'
          'cddf01efd62c477adc8dada7d991b106'
@@ -83,7 +83,7 @@ build() {
   patch -p1 -Ni ../patch-${pkgver}.vvv.nntp.3 # NNTP support. Gmane <3
   # Use normal stat instead of lstat, to support symbolic directories
   patch -p1 -Nui ../newsrc_stat.patch
-  patch -p1 -Nui ../patch-${pkgver}.rr.compressed # Support compressed mail*
+  patch -p1 -Nui ../patch-${pkgver}.rr.compressed # Support compressed mail
   patch -p1 -Nui ../patch-${pkgver}.vvv.initials # Extra format for initials
   patch -p1 -Nui ../patch-${pkgver}.vvv.quote.2 # Smarter quote handling
   patch -p1 -Nui ../trash_folder-1.5.18.patch # Smart trash
@@ -114,7 +114,7 @@ build() {
   patch -p1 < ../mutt-sendbox-bounce.patch
 
   # mutt can set the xterm title! Smart lil' dog, eh?
-  patch -p1 < ${srcdir}/mutt-xterm_title.patch
+  patch -p1 < ${srcdir}/mutt-xterm_title.patch.2
 
   # Delete all the patch-save files
   find -name \*.orig -delete
