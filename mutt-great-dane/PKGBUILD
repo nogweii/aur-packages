@@ -28,6 +28,10 @@ source=(ftp://ftp.mutt.org/mutt/devel/mutt-${pkgver}.tar.gz
         patch-${pkgver}.vvv.initials
         patch-${pkgver}.vvv.nntp.2
         patch-${pkgver}.vvv.quote.2
+        mutt-resent-header-weeding.patch
+        mutt-sendbox-bounce.patch
+        mutt-sendbox.patch
+        mutt-write_postponed.patch
         mutt-attach.patch
         newsrc_stat.patch
         trash_folder-1.5.18.patch
@@ -95,6 +99,14 @@ build() {
   patch -p1 -Nui ../patch-${pkgver}.dgc.deepif.2 # Allow nested if statements
   patch -p1 -Nui ../patch-${pkgver}.ats.date_conditional.3 # Conditions on dates
 
+  # Aron Griffis' sendbox patchset, updated for Mutt 1.5.21
+  # Contributor: Gaetan Bisson <bisson@archlinux.org>
+  # I take no credit, but sendbox is useful, so it's being added.
+  patch -p1 < ../mutt-write_postponed.patch
+  patch -p1 < ../mutt-resent-header-weeding.patch
+  patch -p1 < ../mutt-sendbox.patch
+  patch -p1 < ../mutt-sendbox-bounce.patch
+
   # Delete all the patch-save files
   find -name \*.orig -delete
 
@@ -109,7 +121,7 @@ build() {
   ./configure --prefix=/usr --sysconfdir=/etc \
   --enable-gpgme --enable-pop --enable-imap --enable-smtp --enable-nntp \
   --enable-debug --disable-warnings --enable-compressed --enable-exact-address \
-  --enable-hcache --with-slang --with-regex --with-gss \
+  --enable-hcache --enable-sendbox  --with-slang --with-regex --with-gss \
   --with-ssl=/usr --with-sasl --with-idn || return 1
 
   make || return 1
