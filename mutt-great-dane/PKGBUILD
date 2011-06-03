@@ -35,6 +35,7 @@ source=(ftp://ftp.mutt.org/mutt/devel/mutt-${pkgver}.tar.gz
         mutt-attach.patch
         newsrc_stat.patch
         trash_folder-1.5.18.patch
+        mutt-xterm_title.patch
         patch-0.9.dw.urlview-html.3
         patch-0.9.csev.urlview-fixes.1
         patch-0.9.csev.urlview-manprefix.1
@@ -57,9 +58,14 @@ md5sums=('a29db8f1d51e2f10c070bf88e8a553fd'
          '1e22b6f0a2a6628289baee19c37e2536'
          'ce252bdd16235be3eb7cc6dcc020cdc0'
          'dcdc940070d3bd0bcf7017af70cfffc3'
+         'eb4818622b6540770eeb81dbea8447f8'
+         '0bbc48f7c0cc10e15ac9dbae7d34b82d'
+         '267acfc33f6e3fc75e7f284347d9c4d6'
+         '26be8adc6ba3d2f407ff1d2ed2e647b4'
          '659d26f6dae386d55a58c5311e57632e'
          'e44269dcaada8e6ba9bd299bb4597899'
          'a83177bfd298fa3d2644d538cc79379b'
+         '62915087c5ec050785c85a78415f7ea0'
          'fe79ea2cc0c590762cd7940a1c8e2a9a'
          'b9445c1e532a2a0969fb6e3d8fbc86b5'
          'cddf01efd62c477adc8dada7d991b106'
