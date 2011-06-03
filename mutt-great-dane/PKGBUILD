@@ -107,6 +107,9 @@ build() {
   patch -p1 < ../mutt-sendbox.patch
   patch -p1 < ../mutt-sendbox-bounce.patch
 
+  # mutt can set the xterm title! Smart lil' dog, eh?
+  patch -p1 < ${srcdir}/mutt-xterm_title.patch
+
   # Delete all the patch-save files
   find -name \*.orig -delete
 
