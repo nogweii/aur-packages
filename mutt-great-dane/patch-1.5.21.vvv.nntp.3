@@ -3285,39 +3285,6 @@ diff -udprP mutt-1.5.21/compose.c.orig mutt-nntp-sidebar/compose.c.orig
 +  return (r);
 +}
 +
-diff -udprP mutt-1.5.21/compose.c.rej mutt-nntp-sidebar/compose.c.rej
---- mutt-1.5.21/compose.c.rej	1969-12-31 17:00:00.000000000 -0700
-+++ mutt-nntp-sidebar/compose.c.rej	2011-06-03 07:05:58.912955998 -0700
-@@ -0,0 +1,29 @@
-+@@ -280,9 +314,28 @@
-+ static void draw_envelope (HEADER *msg, char *fcc)
-+ {
-+   draw_envelope_addr (HDR_FROM, msg->env->from);
-++#ifdef USE_NNTP
-++  if (!option (OPTNEWSSEND))
-++  {
-++#endif
-+   draw_envelope_addr (HDR_TO, msg->env->to);
-+   draw_envelope_addr (HDR_CC, msg->env->cc);
-+   draw_envelope_addr (HDR_BCC, msg->env->bcc);
-++#ifdef USE_NNTP
-++  }
-++  else
-++  {
-++    mvprintw (HDR_TO, 0, TITLE_FMT , Prompts[HDR_NEWSGROUPS - 1]);
-++    mutt_paddstr (W, NONULL (msg->env->newsgroups));
-++    mvprintw (HDR_CC, 0, TITLE_FMT , Prompts[HDR_FOLLOWUPTO - 1]);
-++    mutt_paddstr (W, NONULL (msg->env->followup_to));
-++    if (option (OPTXCOMMENTTO))
-++    {
-++      mvprintw (HDR_BCC, 0, TITLE_FMT , Prompts[HDR_XCOMMENTTO - 1]);
-++      mutt_paddstr (W, NONULL (msg->env->x_comment_to));
-++    }
-++  }
-++#endif
-+   mvprintw (HDR_SUBJECT, 0, TITLE_FMT, Prompts[HDR_SUBJECT - 1]);
-+   mutt_paddstr (W, NONULL (msg->env->subject));
-+   draw_envelope_addr (HDR_REPLYTO, msg->env->reply_to);
 diff -udprP mutt-1.5.21/config.h.in mutt-nntp-sidebar/config.h.in
 --- mutt-1.5.21/config.h.in	2010-08-25 09:32:03.000000000 -0700
 +++ mutt-nntp-sidebar/config.h.in	2011-06-03 07:05:58.932955999 -0700
