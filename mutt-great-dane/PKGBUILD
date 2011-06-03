@@ -28,6 +28,7 @@ source=(ftp://ftp.mutt.org/mutt/devel/mutt-${pkgver}.tar.gz
         patch-${pkgver}.vvv.initials
         patch-${pkgver}.vvv.nntp.3
         patch-${pkgver}.vvv.quote.2
+        patch-${pkgver}.csev.fix_pager_face
         mutt-resent-header-weeding.patch
         mutt-sendbox-bounce.patch
         mutt-sendbox.patch
@@ -58,6 +59,7 @@ md5sums=('a29db8f1d51e2f10c070bf88e8a553fd'
          '1e22b6f0a2a6628289baee19c37e2536'
          '6f5f25c7b90382c88b468c1be612d833'
          'dcdc940070d3bd0bcf7017af70cfffc3'
+         '04681abbfbc364c41ff348d06189b85d'
          'eb4818622b6540770eeb81dbea8447f8'
          '0bbc48f7c0cc10e15ac9dbae7d34b82d'
          '267acfc33f6e3fc75e7f284347d9c4d6'
@@ -115,6 +117,8 @@ build() {
 
   # mutt can set the xterm title! Smart lil' dog, eh?
   patch -p1 < ${srcdir}/mutt-xterm_title.patch.2
+
+  patch -p1 -Nui ../patch-${pkgver}.csev.fix_pager_face # fix a syntax error
 
   # Delete all the patch-save files
   find -name \*.orig -delete
