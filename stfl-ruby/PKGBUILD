@@ -5,12 +5,12 @@
 pkgname=stfl-ruby
 _lib=stfl
 pkgver=0.21
-pkgrel=1
+pkgrel=2
 pkgdesc="Library implementing a curses-based widget set for text terminals"
 arch=('i686' 'x86_64')
 url="http://clifford.at/stfl/"
 license=('GPL3')
-depends=('ncurses')
+depends=('ncurses' 'stfl' 'ruby')
 makedepends=('patch' 'swig')
 options=('!libtool')
 changelog=$_lib.changelog
@@ -31,5 +31,5 @@ build() {
 package() {
   cd ${srcdir}/$_lib-$pkgver
 
-  make FOUND_RUBY=1 prefix=/usr DESTDIR=${_lib} install_ruby
+  make FOUND_RUBY=1 prefix=/usr DESTDIR=${pkgdir} install_ruby
 }
