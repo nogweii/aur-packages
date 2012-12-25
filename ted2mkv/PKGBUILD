@@ -14,7 +14,7 @@ pkgdesc="Downloads and converts TED videos to MKV format"
 arch=('any')
 url="https://github.com/oxplot/ted2mkv"
 license=('GPL3')
-depends=('python3' 'mkvtoolnix-cli')
+depends=('python2' 'mkvtoolnix-cli')
 
 _gitroot=https://github.com/oxplot/ted2mkv
 _gitname=ted2mkv
@@ -40,6 +40,7 @@ package() {
   chmod 755 $pkgdir/usr/bin/ted2mkv
   cp get-full-list.py $pkgdir/usr/bin/ted-get-full-list
   chmod 755 $pkgdir/usr/bin/ted-get-full-list
+  sed -i 's/env python$/&2/' $pkgdir/usr/bin/*
 }
 
 # vim:set ts=2 sw=2 et:
