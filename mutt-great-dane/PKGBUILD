@@ -174,7 +174,6 @@ build() {
   # Deprecated
   sed -i '/^AM_C_PROTOTYPES$/{d;q;}' configure.ac
   sed -i 's/AM_CONFIG_HEADER/AC_CONFIG_HEADERS/g' configure.ac
-  sed -i 's/AM_INIT_AUTOMAKE(mutt, \$mutt_cv_version)/AC_INIT([mutt], [\$mutt_cv_version])\nAM_INIT_AUTOMAKE/g' configure.ac
 
   msg "Compiling ${pkgname}-${pkgver}"
 
