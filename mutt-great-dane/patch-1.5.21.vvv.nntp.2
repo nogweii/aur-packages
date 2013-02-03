@@ -1400,7 +1400,7 @@ diff -udprP mutt-1.5.21.orig/compose.c mutt-1.5.21/compose.c
 -#define TITLE_FMT "%10s" /* Used for Prompts, which are ASCII */
 +#define HDR_XOFFSET 14
 +#define TITLE_FMT "%14s" /* Used for Prompts, which are ASCII */
- #define W (COLS - HDR_XOFFSET)
+ #define W (COLS - HDR_XOFFSET - SidebarWidth)
  
  static char *Prompts[] =
 @@ -83,6 +94,16 @@ static char *Prompts[] =
