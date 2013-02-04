@@ -1,0 +1,109 @@
+# Contributor: albertid
+# Maintainer: Colin Shea <colin@shea.at>
+
+pkgbase=xmonad-log-applet
+pkgname=(
+  'xmonad-log-applet-gnome3'
+  'xmonad-log-applet-xfce'
+  'xmonad-log-applet-mate'
+  'xmonad-log-applet-gnome3-git'
+  'xmonad-log-applet-xfce-git'
+  'xmonad-log-applet-mate-git'
+)
+pkgver=2.1.0
+pkgrel=1
+pkgdesc="An applet that will display Xmonad log information (XFCE)"
+arch=('i686' 'x86_64')
+url="https://github.com/alexkay/xmonad-log-applet"
+license=('BSD3')
+
+source=(https://${pkgbase}.googlecode.com/files/${pkgbase}-${pkgver}.tar.gz)
+
+_retreive_git() {
+  _gitroot="git://github.com/alexkay/xmonad-log-applet.git"
+  _gitname="xmonad-log-applet"
+
+  cd "$srcdir"
+  msg "Connecting to GIT server...."
+
+  if [ -d $_gitname ] ; then
+    cd $_gitname && git pull origin
+    msg "The local files are updated."
+  else
+    git clone $_gitroot $_gitname
+  fi
+
+  msg "GIT checkout done or server timeout"
+  msg "Starting make..."
+
+  rm -rf "$srcdir/$_gitname-build"
+  git clone -l "$srcdir/$_gitname" "$srcdir/$_gitname-build"
+  cd "$srcdir/$_gitname-build"
+}
+
+# Expects a parameter: 'gnome3', 'xfce4' or 'mate'
+_compile() {
+  ./autogen.sh --with-panel=$1
+  make || return 1
+  make DESTDIR=$pkgdir install
+}
+
+package_xmonad-log-applet-gnome3() {
+  depends=('gnome-panel>=3.0')
+  pkgver=2.1.0
+
+  cd "$srcdir/$pkgbase-$pkgver"
+  _compile gnome3
+}
+
+package_xmonad-log-applet-xfce() {
+  depends=('xfce4-panel>=4.10.0')
+  pkgver=2.1.0
+
+  cd "$srcdir/$pkgbase-$pkgver"
+  _compile xfce4
+}
+
+package_xmonad-log-applet-mate() {
+  depends=('mate-panel')
+  pkgver=2.1.0
+
+  cd "$srcdir/$pkgbase-$pkgver"
+  _compile mate
+}
+
+package_xmonad-log-applet-gnome3-git() {
+  pkgver=20130202
+  depends=('gnome-panel>=3.0')
+  makedepends=('git')
+  source=()
+
+  _retreive_git
+  _compile gnome3
+
+  rm -rf "$srcdir/$_gitname-build"
+}
+
+package_xmonad-log-applet-mate-git() {
+  pkgver=20130202
+  depends=('mate-panel')
+  makedepends=('git')
+  source=()
+
+  _retreive_git
+  _compile gnome3
+
+  rm -rf "$srcdir/$_gitname-build"
+}
+
+package_xmonad-log-applet-xfce-git() {
+  pkgver=20130202
+  depends=('xfce4-panel>=4.10.0')
+  makedepends=('git')
+  source=()
+
+  _retreive_git
+  _compile gnome3
+
+  rm -rf "$srcdir/$_gitname-build"
+}
