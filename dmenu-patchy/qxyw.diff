@@ -1,58 +1,3 @@
-Only in dmenu-q-xywh-xft: .gitignore
-diff -u dmenu-4.5/Makefile dmenu-q-xywh-xft/Makefile
---- dmenu-4.5/Makefile	2012-01-08 05:18:43.000000000 -0700
-+++ dmenu-q-xywh-xft/Makefile	2013-02-08 22:03:21.394336618 -0700
-@@ -35,7 +35,7 @@
- dist: clean
- 	@echo creating dist tarball
- 	@mkdir -p dmenu-${VERSION}
--	@cp LICENSE Makefile README config.mk dmenu.1 draw.h dmenu_run stest.1 ${SRC} dmenu-${VERSION}
-+	@cp LICENSE Makefile README config.mk dmenu.1 draw.h dmenu_path dmenu_run stest.1 ${SRC} dmenu-${VERSION}
- 	@tar -cf dmenu-${VERSION}.tar dmenu-${VERSION}
- 	@gzip dmenu-${VERSION}.tar
- 	@rm -rf dmenu-${VERSION}
-@@ -43,8 +43,9 @@
- install: all
- 	@echo installing executables to ${DESTDIR}${PREFIX}/bin
- 	@mkdir -p ${DESTDIR}${PREFIX}/bin
--	@cp -f dmenu dmenu_run stest ${DESTDIR}${PREFIX}/bin
-+	@cp -f dmenu dmenu_path dmenu_run stest ${DESTDIR}${PREFIX}/bin
- 	@chmod 755 ${DESTDIR}${PREFIX}/bin/dmenu
-+	@chmod 755 ${DESTDIR}${PREFIX}/bin/dmenu_path
- 	@chmod 755 ${DESTDIR}${PREFIX}/bin/dmenu_run
- 	@chmod 755 ${DESTDIR}${PREFIX}/bin/stest
- 	@echo installing manual pages to ${DESTDIR}${MANPREFIX}/man1
-@@ -57,6 +58,7 @@
- uninstall:
- 	@echo removing executables from ${DESTDIR}${PREFIX}/bin
- 	@rm -f ${DESTDIR}${PREFIX}/bin/dmenu
-+	@rm -f ${DESTDIR}${PREFIX}/bin/dmenu_path
- 	@rm -f ${DESTDIR}${PREFIX}/bin/dmenu_run
- 	@rm -f ${DESTDIR}${PREFIX}/bin/stest
- 	@echo removing manual page from ${DESTDIR}${MANPREFIX}/man1
-Only in dmenu-q-xywh-xft: README.md
-diff -u dmenu-4.5/config.mk dmenu-q-xywh-xft/config.mk
---- dmenu-4.5/config.mk	2013-02-08 22:02:57.921107399 -0700
-+++ dmenu-q-xywh-xft/config.mk	2013-02-08 22:03:21.394336618 -0700
-@@ -1,5 +1,5 @@
- # dmenu version
--VERSION = 4.5
-+VERSION = 4.5-tip
- 
- # paths
- PREFIX = /usr/local
-@@ -21,9 +21,8 @@
- LIBS = -L${X11LIB} -lX11 ${XINERAMALIBS} ${XFTLIBS}
- 
- # flags
--CPPFLAGS = -D_BSD_SOURCE -D_POSIX_C_SOURCE=2 -DVERSION=\"${VERSION}\" ${XINERAMAFLAGS}
--#CFLAGS   = -g -std=c99 -pedantic -Wall -O0 ${INCS} ${CPPFLAGS}
--CFLAGS   = -std=c99 -pedantic -Wall -Os ${INCS} ${CPPFLAGS}
-+CPPFLAGS = -D_BSD_SOURCE -D_POSIX_C_SOURCE=200809L -DVERSION=\"${VERSION}\" ${XINERAMAFLAGS}
-+CFLAGS   = -ansi -pedantic -Wall -Os ${INCS} ${CPPFLAGS}
- LDFLAGS  = -s ${LIBS}
- 
- # compiler and linker
 diff -u dmenu-4.5/dmenu.1 dmenu-q-xywh-xft/dmenu.1
 --- dmenu-4.5/dmenu.1	2013-02-08 22:02:57.927774037 -0700
 +++ dmenu-q-xywh-xft/dmenu.1	2013-02-08 22:03:21.394336618 -0700
@@ -227,24 +172,6 @@ diff -u dmenu-4.5/dmenu.c dmenu-q-xywh-xft/dmenu.c
  				insert(NULL, nextrune(-1) - cursor);
  			break;
  		case XK_y: /* paste selection */
-@@ -352,7 +369,7 @@
- 	case XK_Left:
- 		if(cursor > 0 && (!sel || !sel->left || lines > 0)) {
- 			cursor = nextrune(-1);
--			break;
-+            break;
- 		}
- 		if(lines > 0)
- 			return;
-@@ -383,7 +400,7 @@
- 	case XK_Right:
- 		if(text[cursor] != '\0') {
- 			cursor = nextrune(+1);
--			break;
-+            break;
- 		}
- 		if(lines > 0)
- 			return;
 @@ -580,7 +597,7 @@
  					break;
  
@@ -280,25 +207,3 @@ diff -u dmenu-4.5/dmenu.c dmenu-q-xywh-xft/dmenu.c
  	      "             [-nb color] [-nf color] [-sb color] [-sf color] [-v]\n", stderr);
  	exit(EXIT_FAILURE);
  }
-Only in dmenu-q-xywh-xft: dmenu_path
-diff -u dmenu-4.5/dmenu_run dmenu-q-xywh-xft/dmenu_run
---- dmenu-4.5/dmenu_run	2012-01-08 05:18:43.000000000 -0700
-+++ dmenu-q-xywh-xft/dmenu_run	2013-02-08 22:03:21.394336618 -0700
-@@ -1,15 +1,2 @@
- #!/bin/sh
--cachedir=${XDG_CACHE_HOME:-"$HOME/.cache"}
--if [ -d "$cachedir" ]; then
--	cache=$cachedir/dmenu_run
--else
--	cache=$HOME/.dmenu_cache # if no xdg dir, fall back to dotfile in ~
--fi
--(
--	IFS=:
--	if stest -dqr -n "$cache" $PATH; then
--		stest -flx $PATH | sort -u | tee "$cache" | dmenu "$@"
--	else
--		dmenu "$@" < "$cache"
--	fi
--) | ${SHELL:-"/bin/sh"} &
-+dmenu_path | dmenu "$@" | ${SHELL:-"/bin/sh"} &
-Only in dmenu-4.5: draw.c.orig
