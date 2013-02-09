@@ -16,6 +16,8 @@ pkgdesc="An applet that will display Xmonad log information (XFCE)"
 arch=('i686' 'x86_64')
 url="https://github.com/alexkay/xmonad-log-applet"
 license=('BSD3')
+md5sums=('0e6679a2e84bced2855be07530541849')
+sha256sums=('cea595712888a8b43c11ae0995e9548590b91cc1e18ccecf2a84fb6f971615fa')
 
 source=(https://${pkgbase}.googlecode.com/files/${pkgbase}-${pkgver}.tar.gz)
 
@@ -41,9 +43,13 @@ _retreive_git() {
   cd "$srcdir/$_gitname-build"
 }
 
-# Expects a parameter: 'gnome3', 'xfce4' or 'mate'
+# Expects a parameter: 'gnome2, 'gnome3', 'xfce4' or 'mate'
 _compile() {
-  ./autogen.sh --with-panel=$1
+  if [ -x ./autogen.sh ]; then
+    ./autogen.sh --with-panel=$1
+  else
+    ./configure --with-panel=$1
+  fi
   make || return 1
   make DESTDIR=$pkgdir install
 }
@@ -69,6 +75,7 @@ package_xmonad-log-applet-mate() {
   pkgver=2.1.0
 
   cd "$srcdir/$pkgbase-$pkgver"
+  sed -i 's/1\.4\.0/1\.2\.0/g' configure configure.ac
   _compile mate
 }
 
@@ -76,34 +83,26 @@ package_xmonad-log-applet-gnome3-git() {
   pkgver=20130202
   depends=('gnome-panel>=3.0')
   makedepends=('git')
-  source=()
 
   _retreive_git
   _compile gnome3
-
-  rm -rf "$srcdir/$_gitname-build"
-}
-
-package_xmonad-log-applet-mate-git() {
-  pkgver=20130202
-  depends=('mate-panel')
-  makedepends=('git')
-  source=()
-
-  _retreive_git
-  _compile gnome3
-
-  rm -rf "$srcdir/$_gitname-build"
 }
 
 package_xmonad-log-applet-xfce-git() {
   pkgver=20130202
   depends=('xfce4-panel>=4.10.0')
   makedepends=('git')
-  source=()
 
   _retreive_git
-  _compile gnome3
+  _compile xfce4
+}
 
-  rm -rf "$srcdir/$_gitname-build"
+package_xmonad-log-applet-mate-git() {
+  pkgver=20130202
+  depends=('mate-panel')
+  makedepends=('git')
+
+  _retreive_git
+  sed -i 's/1\.4\.0/1\.2\.0/g' configure.ac
+  _compile mate
 }
