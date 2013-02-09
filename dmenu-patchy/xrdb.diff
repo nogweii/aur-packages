@@ -83,4 +83,3 @@ diff -up dmenu-4.5/dmenu.c dmenu-xrdb/dmenu.c
  void
  appenditem(Item *item, Item **list, Item **last) {
  	if(*last)
-Only in dmenu-xrdb: dmenu.c.orig

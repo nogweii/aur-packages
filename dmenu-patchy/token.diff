@@ -19,7 +19,6 @@ diff -u dmenu-4.5/dmenu.1 dmenu-token/dmenu.1
  .BI \-l " lines"
  dmenu lists items vertically, with the given number of lines.
  .TP
-Only in dmenu-token: dmenu.1.orig
 diff -u dmenu-4.5/dmenu.c dmenu-token/dmenu.c
 --- dmenu-4.5/dmenu.c	2013-02-08 22:28:55.718923115 -0700
 +++ dmenu-token/dmenu.c	2013-02-08 22:50:31.813870783 -0700
@@ -93,4 +92,3 @@ diff -u dmenu-4.5/dmenu.c dmenu-token/dmenu.c
  size_t
  nextrune(int inc) {
  	ssize_t n;
-Only in dmenu-token: dmenu.c.orig
