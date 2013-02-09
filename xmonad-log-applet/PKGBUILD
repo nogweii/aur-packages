@@ -1,8 +1,9 @@
-# Contributor: albertid
-# Maintainer: Colin Shea <colin@shea.at>
+# Contributor: Colin Shea <colin@shea.at>
 
-pkgbase=xmonad-log-applet
-pkgname=(
+pkgname=xmonad-log-applet
+pkgbase=$pkgname
+# AUR still doesn't like split packages
+true && pkgname=(
   'xmonad-log-applet-gnome3'
   'xmonad-log-applet-xfce'
   'xmonad-log-applet-mate'
