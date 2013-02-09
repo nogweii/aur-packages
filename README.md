@@ -9,6 +9,7 @@ Direct links to the AUR packages that I maintain:
 * [stfl-ruby]
 * [ted2mkv]
 * [xmonad-log-applet-xfce4-git]
+* [dmenu-patchy]
 
 [aurList]: http://aur.archlinux.org/packages.php?SeB=m&K=evaryont
 [cave9]: http://aur.archlinux.org/packages/cave9/
@@ -18,3 +19,4 @@ Direct links to the AUR packages that I maintain:
 [stfl-ruby]: http://aur.archlinux.org/packages/stfl-ruby/
 [ted2mkv]: http://aur.archlinux.org/packages/ted2mkv/
 [xmonad-log-applet-xfce4-git]: https://aur.archlinux.org/packages/xmonad-log-applet-xfce4-git/
+[dmenu-patchy]: https://aur.archlinux.org/packages/dmenu-patchy/
