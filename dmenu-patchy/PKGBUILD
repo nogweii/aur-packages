@@ -17,34 +17,34 @@ source=(http://dl.suckless.org/tools/dmenu-$pkgver.tar.gz
         height.diff
         token.diff
         xrdb.diff
-        qxyw.diff)
+        qxyw.diff
+        0001-fix-pasting-from-the-X-clipboard.patch)
 
 md5sums=('9c46169ed703732ec52ed946c27d84b4'
          '0c73d595eb78f159bea83f33bba15e80'
          'dd511592290157ce9d31d37ecffb4d16'
-         '3b45743a9c5577d840f24de93c40a7a0'
+         '1ba23c52f096c473bb2bb379fc0a7be2'
          '347c882d97d8014bc3a6a9e62f008139'
-         '6feb79a92b44899975e1e3e1bcb9404d')
+         'ec3f68700118b006f89683420455139f'
+         'da7caae587c4af5aff8fd508507522c3')
 
 sha256sums=('082cd698d82125ca0b3989006fb84ac4675c2a5585bf5bb8af0ea09cfb95a850'
             'da72bb93d2aa06139bbb53826c50285e754543c19e7945a7f30de4d3b43425b1'
             'b32e0711e6d51cc35ae5bd88299bb4b9fc5e13dc4efd4453e657ced267fe7876'
-            '685258c8f48b15c50f106a400fe340f9f80efae9245f424752a4adff124d8095'
+            'd3466153f6d670cf62cdfd5ab36bf2831982fd1055dcdd7a1f43a6a1d3c8adab'
             'e745548d213c2ad5108c1e28b33c434fce3f0118503426e2e2bc125b841d2d28'
-            'd0c0487d2693888eac796d8c80af6726d5be097c6232effb11b0f089f802b529')
+            'c7c94e41529002f314e100c6178a6982789432aa8be125f0a8e6ff6c868ac339'
+            'd36bd60c6bfd7022a09bc2b249ea5fa4cb599147f35f3073100a31d8149cddd6')
 
 build() {
   cd "$srcdir/dmenu-$pkgver"
-  msg2 'XFT'
-  patch -p1 < $srcdir/xft.diff 
-  msg2 'height'
-  patch -p1 < $srcdir/height.diff 
-  msg2 'qxyw'
-  patch -p1 < $srcdir/qxyw.diff 
-  msg2 'Token'
-  patch -p1 < $srcdir/token.diff 
-  msg2 'xrdb'
-  patch -p1 < $srcdir/xrdb.diff
+  patch -p1 -N -i $srcdir/xft.diff 
+  patch -p1 -N -i $srcdir/height.diff 
+  patch -p1 -N -i $srcdir/qxyw.diff 
+  patch -p1 -N -i $srcdir/token.diff 
+  patch -p1 -N -i $srcdir/xrdb.diff
+  patch -p1 -N -i ../../0001-fix-pasting-from-the-X-clipboard.patch
+  msg2 'compiling'
   make 
 }
 
@@ -55,15 +55,4 @@ package()
   install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
 
 }
-md5sums=('9c46169ed703732ec52ed946c27d84b4'
-         '0c73d595eb78f159bea83f33bba15e80'
-         'dd511592290157ce9d31d37ecffb4d16'
-         '1ba23c52f096c473bb2bb379fc0a7be2'
-         '347c882d97d8014bc3a6a9e62f008139'
-         '6feb79a92b44899975e1e3e1bcb9404d')
-sha256sums=('082cd698d82125ca0b3989006fb84ac4675c2a5585bf5bb8af0ea09cfb95a850'
-            'da72bb93d2aa06139bbb53826c50285e754543c19e7945a7f30de4d3b43425b1'
-            'b32e0711e6d51cc35ae5bd88299bb4b9fc5e13dc4efd4453e657ced267fe7876'
-            'd3466153f6d670cf62cdfd5ab36bf2831982fd1055dcdd7a1f43a6a1d3c8adab'
-            'e745548d213c2ad5108c1e28b33c434fce3f0118503426e2e2bc125b841d2d28'
-            'd0c0487d2693888eac796d8c80af6726d5be097c6232effb11b0f089f802b529')
+
