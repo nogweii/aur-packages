@@ -1,0 +1,304 @@
+Only in dmenu-q-xywh-xft: .gitignore
+diff -u dmenu-4.5/Makefile dmenu-q-xywh-xft/Makefile
+--- dmenu-4.5/Makefile	2012-01-08 05:18:43.000000000 -0700
++++ dmenu-q-xywh-xft/Makefile	2013-02-08 22:03:21.394336618 -0700
+@@ -35,7 +35,7 @@
+ dist: clean
+ 	@echo creating dist tarball
+ 	@mkdir -p dmenu-${VERSION}
+-	@cp LICENSE Makefile README config.mk dmenu.1 draw.h dmenu_run stest.1 ${SRC} dmenu-${VERSION}
++	@cp LICENSE Makefile README config.mk dmenu.1 draw.h dmenu_path dmenu_run stest.1 ${SRC} dmenu-${VERSION}
+ 	@tar -cf dmenu-${VERSION}.tar dmenu-${VERSION}
+ 	@gzip dmenu-${VERSION}.tar
+ 	@rm -rf dmenu-${VERSION}
+@@ -43,8 +43,9 @@
+ install: all
+ 	@echo installing executables to ${DESTDIR}${PREFIX}/bin
+ 	@mkdir -p ${DESTDIR}${PREFIX}/bin
+-	@cp -f dmenu dmenu_run stest ${DESTDIR}${PREFIX}/bin
++	@cp -f dmenu dmenu_path dmenu_run stest ${DESTDIR}${PREFIX}/bin
+ 	@chmod 755 ${DESTDIR}${PREFIX}/bin/dmenu
++	@chmod 755 ${DESTDIR}${PREFIX}/bin/dmenu_path
+ 	@chmod 755 ${DESTDIR}${PREFIX}/bin/dmenu_run
+ 	@chmod 755 ${DESTDIR}${PREFIX}/bin/stest
+ 	@echo installing manual pages to ${DESTDIR}${MANPREFIX}/man1
+@@ -57,6 +58,7 @@
+ uninstall:
+ 	@echo removing executables from ${DESTDIR}${PREFIX}/bin
+ 	@rm -f ${DESTDIR}${PREFIX}/bin/dmenu
++	@rm -f ${DESTDIR}${PREFIX}/bin/dmenu_path
+ 	@rm -f ${DESTDIR}${PREFIX}/bin/dmenu_run
+ 	@rm -f ${DESTDIR}${PREFIX}/bin/stest
+ 	@echo removing manual page from ${DESTDIR}${MANPREFIX}/man1
+Only in dmenu-q-xywh-xft: README.md
+diff -u dmenu-4.5/config.mk dmenu-q-xywh-xft/config.mk
+--- dmenu-4.5/config.mk	2013-02-08 22:02:57.921107399 -0700
++++ dmenu-q-xywh-xft/config.mk	2013-02-08 22:03:21.394336618 -0700
+@@ -1,5 +1,5 @@
+ # dmenu version
+-VERSION = 4.5
++VERSION = 4.5-tip
+ 
+ # paths
+ PREFIX = /usr/local
+@@ -21,9 +21,8 @@
+ LIBS = -L${X11LIB} -lX11 ${XINERAMALIBS} ${XFTLIBS}
+ 
+ # flags
+-CPPFLAGS = -D_BSD_SOURCE -D_POSIX_C_SOURCE=2 -DVERSION=\"${VERSION}\" ${XINERAMAFLAGS}
+-#CFLAGS   = -g -std=c99 -pedantic -Wall -O0 ${INCS} ${CPPFLAGS}
+-CFLAGS   = -std=c99 -pedantic -Wall -Os ${INCS} ${CPPFLAGS}
++CPPFLAGS = -D_BSD_SOURCE -D_POSIX_C_SOURCE=200809L -DVERSION=\"${VERSION}\" ${XINERAMAFLAGS}
++CFLAGS   = -ansi -pedantic -Wall -Os ${INCS} ${CPPFLAGS}
+ LDFLAGS  = -s ${LIBS}
+ 
+ # compiler and linker
+diff -u dmenu-4.5/dmenu.1 dmenu-q-xywh-xft/dmenu.1
+--- dmenu-4.5/dmenu.1	2013-02-08 22:02:57.927774037 -0700
++++ dmenu-q-xywh-xft/dmenu.1	2013-02-08 22:03:21.394336618 -0700
+@@ -41,6 +41,9 @@
+ .B \-b
+ dmenu appears at the bottom of the screen.
+ .TP
++.B \-q
++dmenu will not show any items if the search string is empty.
++.TP
+ .B \-f
+ dmenu grabs the keyboard before reading stdin.  This is faster, but will lock up
+ X until stdin reaches end\-of\-file.
+@@ -60,6 +63,15 @@
+ .BI \-fn " font"
+ defines the font or font set used. eg. "fixed" or "Monospace-12:normal" (an xft font)
+ .TP
++.BI \-x " xoffset"
++defines the offset from the left border of the screen.
++.TP
++.BI \-y " yoffset"
++defines the offset from the top border of the screen.
++.TP
++.BI \-w " width"
++defines the desired menu window width.
++.TP
+ .BI \-nb " color"
+ defines the normal background color.
+ .IR #RGB ,
+@@ -112,6 +124,9 @@
+ C\-f
+ Right
+ .TP
++C\-g
++Escape
++.TP
+ C\-h
+ Backspace
+ .TP
+diff -u dmenu-4.5/dmenu.c dmenu-q-xywh-xft/dmenu.c
+--- dmenu-4.5/dmenu.c	2013-02-08 22:02:57.967773859 -0700
++++ dmenu-q-xywh-xft/dmenu.c	2013-02-08 22:03:21.394336618 -0700
+@@ -51,13 +51,17 @@
+ static const char *normfgcolor = "#bbbbbb";
+ static const char *selbgcolor  = "#005577";
+ static const char *selfgcolor  = "#eeeeee";
+-static unsigned int lines, line_height = 0;
++static unsigned int lines = 0, line_height = 0;
++static int xoffset = 0;
++static int yoffset = 0;
++static int width = 0;
+ static ColorSet *normcol;
+ static ColorSet *selcol;
+ static Atom clip, utf8;
+ static Bool topbar = True;
+ static Bool running = True;
+ static int ret = 0;
++static Bool quiet = False;
+ static DC *dc;
+ static Item *items = NULL;
+ static Item *matches, *matchend;
+@@ -81,6 +85,8 @@
+ 		}
+ 		else if(!strcmp(argv[i], "-b"))   /* appears at the bottom of the screen */
+ 			topbar = False;
++ 		else if(!strcmp(argv[i], "-q"))
++ 			quiet = True;
+ 		else if(!strcmp(argv[i], "-f"))   /* grabs keyboard before reading stdin */
+ 			fast = True;
+ 		else if(!strcmp(argv[i], "-i")) { /* case-insensitive item matching */
+@@ -90,6 +96,12 @@
+ 		else if(i+1 == argc)
+ 			usage();
+ 		/* these options take one argument */
++ 		else if(!strcmp(argv[i], "-x"))
++ 			xoffset = atoi(argv[++i]);
++ 		else if(!strcmp(argv[i], "-y"))
++ 			yoffset = atoi(argv[++i]);
++ 		else if(!strcmp(argv[i], "-w"))
++ 			width = atoi(argv[++i]);
+ 		else if(!strcmp(argv[i], "-l"))   /* number of lines in vertical list */
+ 			lines = atoi(argv[++i]);
+ 		else if(!strcmp(argv[i], "-h"))   /* minimum height of single line */
+@@ -187,7 +199,7 @@
+ 	dc->h = bh;
+ 	drawrect(dc, 0, 0, mw, mh, True, normcol->BG);
+ 
+-	if(prompt) {
++	if(prompt && *prompt) {
+ 		dc->w = promptw;
+ 		drawtext(dc, prompt, selcol);
+ 		dc->x = dc->w;
+@@ -198,30 +210,32 @@
+ 	if((curpos = textnw(dc, text, cursor) + dc->font.height/2) < dc->w)
+ 		drawrect(dc, curpos, (dc->h - dc->font.height)/2 + 1, 1, dc->font.height -1, True, normcol->FG);
+ 
+-	if(lines > 0) {
+-		/* draw vertical list */
+-		dc->w = mw - dc->x;
+-		for(item = curr; item != next; item = item->right) {
+-			dc->y += dc->h;
+-			drawtext(dc, item->text, (item == sel) ? selcol : normcol);
+-		}
+-	}
+-	else if(matches) {
+-		/* draw horizontal list */
+-		dc->x += inputw;
+-		dc->w = textw(dc, "<");
+-		if(curr->left)
+-			drawtext(dc, "<", normcol);
+-		for(item = curr; item != next; item = item->right) {
+-			dc->x += dc->w;
+-			dc->w = MIN(textw(dc, item->text), mw - dc->x - textw(dc, ">"));
+-			drawtext(dc, item->text, (item == sel) ? selcol : normcol);
+-		}
+-		dc->w = textw(dc, ">");
+-		dc->x = mw - dc->w;
+-		if(next)
+-			drawtext(dc, ">", normcol);
+-	}
++    if(!quiet || strlen(text) > 0) {    
++        if(lines > 0) {
++            /* draw vertical list */
++            dc->w = mw - dc->x;
++            for(item = curr; item != next; item = item->right) {
++                dc->y += dc->h;
++                drawtext(dc, item->text, (item == sel) ? selcol : normcol);
++            }
++        }
++        else if(matches) {
++            /* draw horizontal list */
++            dc->x += inputw;
++            dc->w = textw(dc, "<");
++            if(curr->left)
++                drawtext(dc, "<", normcol);
++            for(item = curr; item != next; item = item->right) {
++                dc->x += dc->w;
++                dc->w = MIN(textw(dc, item->text), mw - dc->x - textw(dc, ">"));
++                drawtext(dc, item->text, (item == sel) ? selcol : normcol);
++            }
++            dc->w = textw(dc, ">");
++            dc->x = mw - dc->w;
++            if(next)
++                drawtext(dc, ">", normcol);
++        }
++    }
+ 	mapdc(dc, win, mw, mh);
+ }
+ 
+@@ -269,10 +283,13 @@
+ 		case XK_d: ksym = XK_Delete;    break;
+ 		case XK_e: ksym = XK_End;       break;
+ 		case XK_f: ksym = XK_Right;     break;
++		case XK_g: ksym = XK_Escape;    break;
+ 		case XK_h: ksym = XK_BackSpace; break;
+ 		case XK_i: ksym = XK_Tab;       break;
+-		case XK_j: ksym = XK_Return;    break;
+-		case XK_m: ksym = XK_Return;    break;
++		case XK_j: /* fallthrough */
++		case XK_J: ksym = XK_Return;    break;
++		case XK_m: /* fallthrough */
++		case XK_M: ksym = XK_Return;    break;
+ 		case XK_n: ksym = XK_Down;      break;
+ 		case XK_p: ksym = XK_Up;        break;
+ 
+@@ -286,7 +303,7 @@
+ 		case XK_w: /* delete word */
+ 			while(cursor > 0 && text[nextrune(-1)] == ' ')
+ 				insert(NULL, nextrune(-1) - cursor);
+-			while(cursor > 0 && text[nextrune(-1)] != ' ')
++			while(cursor > 0 && text[nextrune(-1)] != ' ' && text[nextrune(-1)] != '/')
+ 				insert(NULL, nextrune(-1) - cursor);
+ 			break;
+ 		case XK_y: /* paste selection */
+@@ -352,7 +369,7 @@
+ 	case XK_Left:
+ 		if(cursor > 0 && (!sel || !sel->left || lines > 0)) {
+ 			cursor = nextrune(-1);
+-			break;
++            break;
+ 		}
+ 		if(lines > 0)
+ 			return;
+@@ -383,7 +400,7 @@
+ 	case XK_Right:
+ 		if(text[cursor] != '\0') {
+ 			cursor = nextrune(+1);
+-			break;
++            break;
+ 		}
+ 		if(lines > 0)
+ 			return;
+@@ -580,7 +597,7 @@
+ 					break;
+ 
+ 		x = info[i].x_org;
+-		y = info[i].y_org + (topbar ? 0 : info[i].height - mh);
++		y = info[i].y_org + (topbar ? yoffset : info[i].height - mh - yoffset);
+ 		mw = info[i].width;
+ 		XFree(info);
+ 	}
+@@ -588,10 +605,13 @@
+ #endif
+ 	{
+ 		x = 0;
+-		y = topbar ? 0 : DisplayHeight(dc->dpy, screen) - mh;
++		y = topbar ? 0 : DisplayHeight(dc->dpy, screen) - mh - yoffset;
+ 		mw = DisplayWidth(dc->dpy, screen);
+ 	}
+-	promptw = prompt ? textw(dc, prompt) : 0;
++
++	x += xoffset;
++	mw = width ? width : mw;
++	promptw = (prompt && *prompt) ? textw(dc, prompt) : 0;
+ 	inputw = MIN(inputw, mw/3);
+ 	match();
+ 
+@@ -616,7 +636,8 @@
+ 
+ void
+ usage(void) {
+-	fputs("usage: dmenu [-b] [-f] [-i] [-l lines] [-h height] [-p prompt] [-fn font]\n"
++	fputs("usage: dmenu [-b] [-q] [-f] [-i] [-l lines] [-p prompt] [-fn font]\n"
++	      "             [-x xoffset] [-y yoffset] [-h height] [-w width]\n"
+ 	      "             [-nb color] [-nf color] [-sb color] [-sf color] [-v]\n", stderr);
+ 	exit(EXIT_FAILURE);
+ }
+Only in dmenu-q-xywh-xft: dmenu_path
+diff -u dmenu-4.5/dmenu_run dmenu-q-xywh-xft/dmenu_run
+--- dmenu-4.5/dmenu_run	2012-01-08 05:18:43.000000000 -0700
++++ dmenu-q-xywh-xft/dmenu_run	2013-02-08 22:03:21.394336618 -0700
+@@ -1,15 +1,2 @@
+ #!/bin/sh
+-cachedir=${XDG_CACHE_HOME:-"$HOME/.cache"}
+-if [ -d "$cachedir" ]; then
+-	cache=$cachedir/dmenu_run
+-else
+-	cache=$HOME/.dmenu_cache # if no xdg dir, fall back to dotfile in ~
+-fi
+-(
+-	IFS=:
+-	if stest -dqr -n "$cache" $PATH; then
+-		stest -flx $PATH | sort -u | tee "$cache" | dmenu "$@"
+-	else
+-		dmenu "$@" < "$cache"
+-	fi
+-) | ${SHELL:-"/bin/sh"} &
++dmenu_path | dmenu "$@" | ${SHELL:-"/bin/sh"} &
+Only in dmenu-4.5: draw.c.orig
